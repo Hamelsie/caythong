@@ -1,0 +1,84 @@
+const canvas = document.getElementById('myCanvas');
+const ctx = canvas.getContext('2d');
+
+const n = 100.0;
+
+function drawLight(x, y) {
+  const randomNum = Math.random() * 30;
+  ctx.beginPath();
+  ctx.fillStyle = randomNum === 0 ? 'tomato' : randomNum === 1 ? 'orange' : 'darkgreen';
+  ctx.arc(x, y, randomNum === 0 ? 6 : randomNum === 1 ? 3 : 2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.closePath();
+}
+
+function drawTree(d, s, x, y, angle) {
+  if (d <= 0) return;
+  ctx.save();
+  ctx.strokeStyle = 'darkgreen';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  const newX = x + s * Math.cos(angle);
+  const newY = y + s * Math.sin(angle);
+  ctx.lineTo(newX, newY);
+  ctx.stroke();
+  ctx.closePath();
+  drawLight(newX, newY);
+  drawTree(d - 1, s * 0.8, newX, newY, angle - Math.PI / 3);
+  drawTree(d - 3, s * 0.5, newX, newY, angle + Math.PI / 3);
+  ctx.restore();
+}
+
+function drawSnow(x, y) {
+  const dens = 6;
+  const snowsize = Math.floor(Math.random() * 10) + 1;
+  ctx.fillStyle = 'white';
+  for (let i = 0; i < dens; i++) {
+    ctx.fillRect(x, y, snowsize, snowsize);
+    ctx.translate(x, y);
+    ctx.rotate((Math.PI / 180) * (360 / dens));
+    ctx.translate(-x, -y);
+  }
+}
+
+ctx.translate(400, 600);
+ctx.rotate(-Math.PI / 2);
+
+ctx.fillStyle = 'orange';
+ctx.beginPath();
+ctx.moveTo(0, 0);
+for (let i = 0; i < 5; i++) {
+  ctx.forward(n / 5);
+  ctx.rotate((Math.PI / 180) * 144);
+  ctx.forward(n / 5);
+  ctx.rotate((Math.PI / 180) * -72);
+}
+ctx.fill();
+ctx.closePath();
+
+drawTree(15, n, 0, 0, 0);
+
+for (let i = 0; i < 200; i++) {
+  const a = 200 - 400 * Math.random();
+  const b = 10 - 20 * Math.random();
+  ctx.save();
+  ctx.translate(b, a);
+  ctx.beginPath();
+  ctx.arc(0, 0, 2, 0, Math.PI * 2);
+  ctx.fillStyle = Math.random() < 0.5 ? 'tomato' : 'wheat';
+  ctx.fill();
+  ctx.closePath();
+  ctx.restore();
+}
+
+ctx.font = '40px Arial';
+ctx.fillStyle = 'red';
+ctx.textAlign = 'center';
+ctx.fillText('Merry Christmas', 0, -300);
+
+for (let i = 0; i < 200; i++) {
+  const x = Math.floor(Math.random() * 700) - 350;
+  const y = Math.floor(Math.random() * 450) - 100;
+  drawSnow(x, y);
+}
